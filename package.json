@@ -1,0 +1,55 @@
+{
+  "name": "test-checkout",
+  "version": "1.0.0",
+  "description": "test-checkout",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest --config jestconfig.json",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SaraHasan224/bsecure-node-sdk"
+  },
+  "keywords": [
+    "payments",
+    "node",
+    "nodejs",
+    "bsecure-node",
+    "bsecure",
+    "one-click-checkout",
+    "universal-checkout",
+    "ecommerce",
+    "two-step-checkout",
+    "sso",
+    "single-sign-on"
+  ],
+  "author": "https://github.com/SaraHasan224/bsecure-node-sdk/graphs/contributors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SaraHasan224/bsecure-node-sdk/issues"
+  },
+  "homepage": "https://github.com/SaraHasan224/bsecure-node-sdk#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "jest": "^26.6.3",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.0",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.1.3"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}
