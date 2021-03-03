@@ -1,6 +1,7 @@
 'use strict';
 
-var Api = require('./helpers/apis');
+const Api = require('./helpers/apis');
+const UTILS = require('./utils/general');
 const CONSTANT = require('./helpers/constant');
 const AuthToken = require('./resources/authentication');
 
@@ -13,67 +14,72 @@ class bSecure {
         this.addResources();
       }
 
-    validate(_ref) {
-      var environment = this.empty(_ref) || this.empty(_ref.environment) ? null : _ref.environment,
-        client_id = this.empty(_ref) || this.empty(_ref.client_id) ? null : _ref.client_id,
-        client_secret = this.empty(_ref) || this.empty(_ref.client_secret) ? null : _ref.client_secret;
-      var empty = void 0;
-      switch (environment) {
-        case CONSTANT.ENVIRONMENT.SANDBOX:
-          empty = this.empty(client_id);
-          break;
-        case CONSTANT.ENVIRONMENT.LIVE:
-          empty = this.empty(client_secret);
-          break;
-        default:
-          return new Error('invalid environment');
+
+      validate(_ref) {
+        const environment = UTILS.isEmpty(_ref) || this.empty(_ref.environment) ? null : _ref.environment,
+          client_id = this.empty(_ref) || this.empty(_ref.client_id) ? null : _ref.client_id,
+          client_secret = this.empty(_ref) || this.empty(_ref.client_secret) ? null : _ref.client_secret;
+          const empty = void 0;
+        switch (environment) {
+          case CONSTANT.ENVIRONMENT.SANDBOX:
+            empty = this.empty(client_id);
+            break;
+          case CONSTANT.ENVIRONMENT.LIVE:
+            empty = this.empty(client_secret);
+            break;
+          default:
+            return new Error('invalid environment');
+        }
+        if (empty) {
+          throw new Error(`api keys for ${environment} are missing`);
+        }
       }
-      if (empty) {
-        throw new Error(`api keys for ${environment} are missing`);
-      }
-    }
-
-    empty() {
-      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-      return Object.keys(options).every(function (o) {
-        return !options[o];
-      });
-    }
-
-    createClient(_ref) {
-      var environment = this.empty(_ref) || this.empty(_ref.environment) ? null : _ref.environment,
-        client_id = this.empty(_ref) || this.empty(_ref.client_id) ? null : _ref.client_id,
-        client_secret = this.empty(_ref) || this.empty(_ref.client_secret) ? null : _ref.client_secret;
-      return new Api({
-        environment: environment,
-        client_id: client_id,
-        client_secret: client_secret,
-        access_token: null,
-        checkout_btn: null,
-      });
-    }
-
-    createToken() {
-      return AuthToken(this.api)
-        .generate()
-        .then((response) => {
-          this.api = response;
-          this.addResources();
-          return response;
-        })
-        .catch((error) => {
-          return error;
+    
+      empty() {
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    
+        return Object.keys(options).every(function (o) {
+          return !options[o];
         });
-    }
-
-    addResources() {
-      Object.assign(this, {
-        Order: require('./resources/Checkout/order_create')(this.api),
-        OrderStatus: require('./resources/Checkout/order_status')(this.api),
-        SingleSignOn: require('./resources/SSO/client-authenticate')(this.api),
-      });
-    }
+      }
+    
+      createClient(_ref) {
+        var environment = this.empty(_ref) || this.empty(_ref.environment) ? null : _ref.environment,
+          client_id = this.empty(_ref) || this.empty(_ref.client_id) ? null : _ref.client_id,
+          client_secret = this.empty(_ref) || this.empty(_ref.client_secret) ? null : _ref.client_secret;
+        return new Api({
+          environment: environment,
+          client_id: client_id,
+          client_secret: client_secret,
+          access_token: null,
+          checkout_btn: null,
+        });
+      }
+    
+      createToken() {
+        return AuthToken(this.api)
+          .generate()
+          .then((response) => {
+            this.api = response;
+            this.addResources();
+            return response;
+          })
+          .catch((error) => {
+            return error;
+          });
+      }
+    
+      getCheckoutButton() {
+        return this.api.checkout_btn;
+      }
+    
+      addResources() {
+        Object.assign(this, {
+          Order: require('./resources/Checkout/order_create')(this.api),
+          OrderStatus: require('./resources/Checkout/order_status')(this.api),
+          SingleSignOn: require('./resources/SSO/client-authenticate')(this.api),
+        });
+      }
 }
 
 module.exports = bSecure;
